@@ -5,19 +5,19 @@ COPY ./ /backend
 
 RUN go get github.com/gorilla/mux
 
-# RUN go get github.com/githubnemo/CompileDaemon
-# ENTRYPOINT CompileDaemon --build="go build -o ./app ./app/main.go" --command="./app"
-
 # RUN go mod init backend — creates go.mod
 RUN go build
+RUN go mod tidy
 
 ARG ENV
-CMD /bin/bash -c "if [[ $${ENV} == \"production\" ]]; \
+ENTRYPOINT if [ $${ENV} = production ]; \
 	then \
-		app; \
+		./builds/builded_backend; \
 	else \
-		go get github.com/pilu/fresh && \
-		fresh; \
-	fi"
+		# go get github.com/pilu/fresh && \
+		# fresh; \
+		go get github.com/githubnemo/CompileDaemon && \
+		CompileDaemon --build="go build -o ./builds/backend" --command="./builds/backend"; \
+	fi
 
 EXPOSE 3000
